@@ -254,7 +254,7 @@ def get_current_mods(client, conn_type):
                             file_size = int(part)
                             break
 
-                     if file_size is None:
+                    if file_size is None:
                         # Fallback: assume 5th position (index 4)
                         file_size = int(parts[4])                   
                 except (ValueError, IndexError):
