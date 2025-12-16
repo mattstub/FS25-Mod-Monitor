@@ -1,13 +1,13 @@
 # FS25 Mod Monitor 🚜
 
-Automated monitoring system for Farming Simulator 25 server mods. Tracks mod additions, removals, and updates via SFTP and posts detailed notifications to Discord.
+Automated monitoring system for Farming Simulator 25 server mods. Tracks mod additions, removals, and updates via FTP/SFTP and posts detailed notifications to Discord.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 
 ## Features
 
-- **Automatic Mod Tracking** - Monitors your FS25 server's mod folder via SFTP
+- **Automatic Mod Tracking** - Monitors your FS25 server's mod folder via FTP/SFTP
 - **Detailed Change Detection** - Tracks added, removed, and updated mods
 - **Rich Metadata** - Extracts mod title, version, author, and file size from modDesc.xml
 - **Discord Integration** - Posts formatted notifications with change summaries
