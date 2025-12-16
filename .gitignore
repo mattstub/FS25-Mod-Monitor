@@ -1,0 +1,205 @@
+# ===========================================
+# SECURITY - NEVER COMMIT THESE
+# ===========================================
+
+# Your actual credentials
+config.py
+
+# Runtime state (contains server file history)
+mod_state.json
+*.json
+
+# Any backup files with credentials
+config.py.bak
+config.py.backup
+config.py.old
+*.bak
+
+# Environment variables file (if you use one)
+.env
+.env.local
+.env.*.local
+
+# SSH keys (if accidentally placed in project)
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+*.ppk
+
+# ===========================================
+# PYTHON
+# ===========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# ===========================================
+# IDE / EDITOR
+# ===========================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# ===========================================
+# OPERATING SYSTEM
+# ===========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# LOGS & TEMPORARY FILES
+# ===========================================
+
+# Log files
+*.log
+logs/
+*.log.*
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ===========================================
+# PROJECT SPECIFIC
+# ===========================================
+
+# Test files (if you create them)
+test_config.py
+test_*.py
+*_test.py
+
+# Local scripts
+local_*.sh
+local_*.py
+
+# Documentation builds
+docs/_build/
+site/
+
+# ===========================================
+# NOTES & SCRATCHPAD
+# ===========================================
+
+# Personal notes that shouldn't be shared
+NOTES.md
+TODO.md
+SCRATCH.md
+notes/
+drafts/
+
+# ===========================================
+# ARCHIVES & BACKUPS
+# ===========================================
+
+*.zip
+*.tar.gz
+*.rar
+*.7z
+backup/
+backups/
+old/
