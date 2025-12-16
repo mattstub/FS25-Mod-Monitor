@@ -216,26 +216,49 @@ def get_current_mods(client, conn_type):
             # Change to mods directory
             client.cwd(SFTP_MODS_PATH)
 
-            # Get file listing
-            files = []
-            client.dir(files.append)       
+            # Get file listing with detailed info
+            file_list = []
+
+            def parse_line(line):
+                """Callback to collect directory listing lines"""
+                file_list.append(line)
             
-            for file_attr in files:
-                # Parse FTP LIST output (typically: permissions links owner group size month day time filename)
+            client.dir(parse_line)       
+            
+            # Parse each file in the listing
+            for file_line in file_list:
+                # Parse FTP LIST output 
+                 # Typical format: -rw-r--r-- 1 owner group size month day time filename
+                # or: drwxr-xr-x 2 owner group size month day time foldername
                 parts = file_line.split()
+
                 if len(parts) < 9:
                     continue
-                
+
+                # Skip directories (first char is 'd')
+                if parts[0].startswith('d'):
+                    continue               
+
                 filename = parts[-1]
                 
                 # Only process .zip files
                 if not filename.lower().endswith('.zip'):
                     continue
                 
-                # Get file size (5th column in most FTP servers)
+                # Get file size (varies by FTP server format, usually 5th column)
                 try:
-                    file_size = int(parts[4])
-                except:
+                    # Try to find the size - it's usually the first number-only field
+                    file_size = None
+                    for part in parts[1:8]:  # Size is typically in first 8 columns
+                        if part.isdigit():
+                            file_size = int(part)
+                            break
+
+                     if file_size is None:
+                        # Fallback: assume 5th position (index 4)
+                        file_size = int(parts[4])                   
+                except (ValueError, IndexError):
+                    print(f"  Warning: Could not determine size for {filename}, using 0")
                     file_size = 0
 
                 remote_path = f"{SFTP_MODS_PATH}/{filename}"

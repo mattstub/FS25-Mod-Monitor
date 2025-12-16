@@ -5,6 +5,27 @@ All notable changes to the FS25 Mod Monitor project will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2024-12-16
+
+### Fixed
+- **Critical:** FTP directory parsing bug that prevented mod scanning
+  - Fixed `'file_line' is not defined` error when using FTP connections
+  - Improved FTP directory listing collection with proper callback function
+  - Enhanced file size parsing to handle various FTP server response formats
+  - Added directory filtering to skip folders and only process files
+  - Better error handling for malformed FTP directory entries
+
+### Changed
+- Refactored FTP directory parsing logic for more robust handling
+- Improved file size detection with fallback mechanisms for different server formats
+- Added warning messages when file size cannot be determined (uses 0 as fallback)
+
+### Technical Details
+- Replaced `client.dir(files.append)` with proper callback function `parse_line()`
+- Added directory type checking to skip entries starting with 'd' (directories)
+- Implemented intelligent file size parsing that searches multiple columns for numeric values
+- Enhanced error messages for debugging FTP listing issues
+
 ## [2.0.0] - 2024-12-16
 
 ### Added
