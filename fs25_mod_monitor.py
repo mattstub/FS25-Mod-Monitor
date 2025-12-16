@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 import requests
+from ftplib import FTP, FTP_TLS
 
 # Import configuration
 try:
@@ -30,32 +31,111 @@ SFTP_MODS_PATH = config.SFTP_MODS_PATH
 DISCORD_WEBHOOK_URL = config.DISCORD_WEBHOOK_URL
 STATE_FILE = config.STATE_FILE
 
+# FTP/SFTP mode selection (will auto-detect)
+USE_FTP = getattr(config, 'USE_FTP', None)  # Can be True, False, or None (auto-detect)
+
 # =========================
 # FUNCTIONS
 # =========================
+
+def connect_ftp():
+    """Establish FTP connection to the server"""
+    try:
+        # Try FTP with TLS first (more secure)
+        try:
+            ftp = FTP_TLS()
+            ftp.connect(SFTP_HOST, SFTP_PORT if SFTP_PORT != 22 else 21)
+            ftp.login(SFTP_USERNAME, SFTP_PASSWORD)
+            ftp.prot_p()  # Enable encryption
+            print(f"✓ Connected to {SFTP_HOST} (using FTPS)")
+            return ftp, 'ftp'
+        except:
+            # Fall back to plain FTP
+            ftp = FTP()
+            ftp.connect(SFTP_HOST, SFTP_PORT if SFTP_PORT != 22 else 21)
+            ftp.login(SFTP_USERNAME, SFTP_PASSWORD)
+            print(f"✓ Connected to {SFTP_HOST} (using FTP)")
+            return ftp, 'ftp'
+    except Exception as e:
+        print(f"✗ FTP Connection failed: {e}")
+        return None, None
 
 def connect_sftp():
     """Establish SFTP connection to the server"""
     try:
         transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
-        transport.connect(username=SFTP_USERNAME, password=SFTP_PASSWORD)
+        
+        # Try SSH key authentication first (more secure)
+        try:
+            key_path = os.path.expanduser('~/.ssh/id_rsa')
+            if os.path.exists(key_path):
+                private_key = paramiko.RSAKey.from_private_key_file(key_path)
+                transport.connect(username=SFTP_USERNAME, pkey=private_key)
+                print(f"✓ Connected to {SFTP_HOST} (using SSH key)")
+            else:
+                transport.connect(username=SFTP_USERNAME, password=SFTP_PASSWORD)
+                print(f"✓ Connected to {SFTP_HOST} (using password)")
+        except paramiko.ssh_exception.AuthenticationException:
+            transport.connect(username=SFTP_USERNAME, password=SFTP_PASSWORD)
+            print(f"✓ Connected to {SFTP_HOST} (using password)")
+        
         sftp = paramiko.SFTPClient.from_transport(transport)
-        print(f"✓ Connected to {SFTP_HOST}")
         return sftp, transport
     except Exception as e:
         print(f"✗ SFTP Connection failed: {e}")
         return None, None
 
-def extract_mod_info(sftp, remote_file_path, file_size):
+def connect_server():
+    """Auto-detect and connect to server using FTP or SFTP"""
+    global USE_FTP
+    
+    # If user specified FTP/SFTP in config, use that
+    if USE_FTP is True:
+        return connect_ftp()
+    elif USE_FTP is False:
+        client, transport = connect_sftp()
+        return client, 'sftp' if client else None
+    
+    # Auto-detect: try SFTP first (port 22), then FTP
+    print("Auto-detecting connection type...")
+    
+    if SFTP_PORT == 22:
+        print("Trying SFTP (port 22)...")
+        client, transport = connect_sftp()
+        if client:
+            return client, 'sftp'
+        
+        print("SFTP failed, trying FTP (port 21)...")
+        return connect_ftp()
+    else:
+        # Non-standard port, try FTP first
+        print(f"Trying FTP (port {SFTP_PORT})...")
+        client, conn_type = connect_ftp()
+        if client:
+            return client, conn_type
+        
+        print("FTP failed, trying SFTP...")
+        client, transport = connect_sftp()
+        return (client, 'sftp') if client else (None, None)
+
+def extract_mod_info(client, conn_type, remote_file_path, file_size):
     """
     Extract mod information from modDesc.xml inside the zip file
+    Works with both FTP and SFTP
     Returns: dict with title, version, author, filesize
     """
     try:
         # Download the zip file to memory
-        with sftp.file(remote_file_path, 'r') as remote_file:
-            zip_data = io.BytesIO(remote_file.read())
+        zip_data = io.BytesIO()
         
+        if conn_type == 'sftp':
+            with client.file(remote_file_path, 'r') as remote_file:
+                zip_data.write(remote_file.read())
+        else:  # FTP
+            client.retrbinary(f'RETR {remote_file_path}', zip_data.write)
+        
+        zip_data.seek(0)
+                
         # Open zip and extract modDesc.xml
         with zipfile.ZipFile(zip_data, 'r') as zip_ref:
             # Try to find modDesc.xml (case-insensitive)
@@ -105,29 +185,64 @@ def extract_mod_info(sftp, remote_file_path, file_size):
             'filesize': file_size
         }
 
-def get_current_mods(sftp):
+def get_current_mods(client, conn_type):
     """
     Scan the mods directory and return a dict of current mods with their info
+    Works with both FTP and SFTP
     Key: filename, Value: {title, version, author, filesize}
     """
     current_mods = {}
-    
+
     try:
-        files = sftp.listdir_attr(SFTP_MODS_PATH)
-        
-        for file_attr in files:
-            filename = file_attr.filename
+        if conn_type == 'sftp':
+            # SFTP method
+            files = client.listdir_attr(SFTP_MODS_PATH)
             
-            # Only process .zip files
-            if not filename.lower().endswith('.zip'):
-                continue
+            for file_attr in files:
+                filename = file_attr.filename
+                
+                # Only process .zip files
+                if not filename.lower().endswith('.zip'):
+                    continue
+                
+                file_size = file_attr.st_size
+                remote_path = f"{SFTP_MODS_PATH}/{filename}"
+                
+                print(f"  Scanning: {filename}")
+                mod_info = extract_mod_info(client, conn_type, remote_path, file_size)
+                current_mods[filename] = mod_info
+
+        else:  # FTP
+            # Change to mods directory
+            client.cwd(SFTP_MODS_PATH)
+
+            # Get file listing
+            files = []
+            client.dir(files.append)       
             
-            file_size = file_attr.st_size
-            remote_path = f"{SFTP_MODS_PATH}/{filename}"
-            
-            print(f"  Scanning: {filename}")
-            mod_info = extract_mod_info(sftp, remote_path, file_size)
-            current_mods[filename] = mod_info
+            for file_attr in files:
+                # Parse FTP LIST output (typically: permissions links owner group size month day time filename)
+                parts = file_line.split()
+                if len(parts) < 9:
+                    continue
+                
+                filename = parts[-1]
+                
+                # Only process .zip files
+                if not filename.lower().endswith('.zip'):
+                    continue
+                
+                # Get file size (5th column in most FTP servers)
+                try:
+                    file_size = int(parts[4])
+                except:
+                    file_size = 0
+
+                remote_path = f"{SFTP_MODS_PATH}/{filename}"
+                
+                print(f"  Scanning: {filename}")
+                mod_info = extract_mod_info(client, conn_type, remote_path, file_size)
+                current_mods[filename] = mod_info
         
         print(f"✓ Found {len(current_mods)} mods")
         return current_mods
@@ -278,14 +393,14 @@ def main():
     print(f"Time: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}")
     print("="*50 + "\n")
     
-    # Connect to SFTP
-    sftp, transport = connect_sftp()
-    if not sftp:
+    # Connect to server (auto-detects FTP or SFTP)
+    client, conn_type = connect_server()
+    if not client:
         return
     
     try:
         # Get current mods
-        current_mods = get_current_mods(sftp)
+        current_mods = get_current_mods(client, conn_type)
         
         # Load previous state
         previous_mods = load_previous_state()
@@ -308,8 +423,12 @@ def main():
         
     finally:
         # Close connection
-        sftp.close()
-        transport.close()
+        if conn_type == 'sftp':
+            client.close()
+            # Note: transport is not returned in new structure, 
+            # but SFTP client close should handle cleanup
+        else:  # FTP
+            client.quit()
         print("\n✓ Connection closed")
     
     print("\n" + "="*50)

@@ -36,7 +36,7 @@ Checked at 2024-12-16 02:00 PM
 ## Prerequisites
 
 - Python 3.7 or higher
-- SFTP access to your G-Portal server
+- FTP or SFTP access to your G-Portal server
 - Discord webhook for notifications
 - PythonAnywhere account (free or paid) or local machine/Raspberry Pi
 
