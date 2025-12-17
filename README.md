@@ -44,4 +44,4 @@ MIT License - feel free to use and modify for your needs.
 For issues or questions:
 - Open an issue on GitHub
 - Check existing issues for solutions
-- Read the [Wiki](/wiki/Home.md) for detailed instructions and troubleshooting
+- Read the [Wiki](../../wiki) for detailed instructions and troubleshooting
