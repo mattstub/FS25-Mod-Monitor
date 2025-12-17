@@ -6,7 +6,6 @@ Automated monitoring system for Farming Simulator 25 server mods. Tracks mod add
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 
 ## Features
-
 - **Automatic Mod Tracking** - Monitors your FS25 server's mod folder via FTP/SFTP
 - **Detailed Change Detection** - Tracks added, removed, and updated mods
 - **Rich Metadata** - Extracts mod title, version, author, and file size from modDesc.xml
@@ -16,7 +15,6 @@ Automated monitoring system for Farming Simulator 25 server mods. Tracks mod add
 - **Secure** - Credentials stored separately from code
 
 ## Example Discord Notification
-
 ```
 🚜 Farming Simulator 25 - Mod Changes Detected
 
@@ -34,19 +32,16 @@ Checked at 2024-12-16 02:00 PM
 ```
 
 ## Prerequisites
-
 - Python 3.7 or higher
-- FTP or SFTP access to your G-Portal server
+- FTP or SFTP access to your Gaming Host server
 - Discord webhook for notifications
 - PythonAnywhere account (free or paid) or local machine/Raspberry Pi
 
 ## License
-
 MIT License - feel free to use and modify for your needs.
 
 ## Support
-
 For issues or questions:
 - Open an issue on GitHub
 - Check existing issues for solutions
-- Review the detailed setup instructions in `SETUP_INSTRUCTIONS.md`
+- Read the [Wiki](/wiki/Home.md) for detailed instructions and troubleshooting
