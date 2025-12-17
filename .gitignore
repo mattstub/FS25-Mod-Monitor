@@ -149,7 +149,7 @@ $RECYCLE.BIN/
 .Trash-*
 .nfs*
 
-# ===========================================
+# ===========================================0
 # LOGS & TEMPORARY FILES
 # ===========================================
 
@@ -170,7 +170,6 @@ temp/
 
 # Test files (if you create them)
 test_config.py
-test_*.py
 *_test.py
 
 # Local scripts
@@ -203,5 +202,3 @@ drafts/
 backup/
 backups/
 old/
-
-.wiki/
