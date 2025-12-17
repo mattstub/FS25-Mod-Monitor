@@ -5,6 +5,44 @@ All notable changes to the FS25 Mod Monitor project will be documented in this. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2024-12-16
+
+### Fixed
+
+- **Critical:** Version parsing bug in mod metadata extraction
+  - Script was incorrectly reading `descVersion` attribute (XML schema version like "98") instead of `<version>` element (actual mod version like "1.1.0.0")
+  - Discord notifications now show correct mod version numbers
+  - Affected all mod change notifications since v2.0.0
+
+### Added
+
+- **Mod Parser Unit Test** - `test_mod_parser.py` for testing and validating mod metadata extraction
+  - Parse any FS25 mod.zip file to view extracted metadata
+  - Validates that version is correctly extracted from `<version>` element
+  - Shows debug information including descVersion for comparison
+  - Outputs JSON format for integration testing
+  - Helps troubleshoot mod parsing issues before deployment
+- **Task runner integration** - `python run.py test-mod <path>` command
+- **Makefile integration** - `make test-mod MOD=<path>` command
+
+### Changed
+
+- Improved version extraction logic with explicit element selection
+- Enhanced error handling for missing version elements
+
+### Technical Details
+
+- Changed from `root.get('descVersion')` to `root.find('version').text`
+- Added validation check in unit test to prevent regression
+- Test suite now includes mod parsing validation
+
+### Migration Notes
+
+- **No action required** for existing installations
+- Simply update to latest version - parsing will automatically use correct version field
+- Historical mod_state.json may contain incorrect versions from before this fix
+- Consider clearing mod_state.json after update to rebuild with correct versions
+
 ## [2.1.0] - 2024-12-16
 
 ### Added

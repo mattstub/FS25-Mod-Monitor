@@ -37,6 +37,7 @@ def show_help():
     print("  python run.py test          - Run all tests")
     print("  python run.py test-ftp      - Test FTP/SFTP connection")
     print("  python run.py test-discord  - Test Discord webhook")
+    print("  python run.py test-mod      - Test mod parser (requires mod.zip path)")
     print("")
     print("Running:")
     print("  python run.py run           - Run the mod monitor once")
@@ -124,6 +125,23 @@ def test_discord():
         return False
     
     return run_command("python test_discord.py")
+
+def test_mod():
+    """Test mod parser"""
+    print_header("Testing Mod Parser")
+    
+    if not Path("test_mod_parser.py").exists():
+        print("✗ test_mod_parser.py not found!")
+        return False
+    
+    if len(sys.argv) < 3:
+        print("Usage: python run.py test-mod <path_to_mod.zip>")
+        print("\nExample:")
+        print("  python run.py test-mod ./mods/FS25_SomeMod.zip")
+        return False
+    
+    mod_path = sys.argv[2]
+    return run_command(f"python test_mod_parser.py {mod_path}")
 
 def run_monitor():
     """Run the mod monitor"""

@@ -164,7 +164,8 @@ def extract_mod_info(client, conn_type, remote_file_path, file_size):
                     title = root.find('.//title')
                 title = title.text if title is not None else Path(remote_file_path).stem
                 
-                version = root.get('descVersion', 'Unknown')
+                version_elem = root.find('version')
+                version = version_elem.text if version_elem is not None else 'Unknown'
                 
                 author = root.find('.//author')
                 author = author.text if author is not None else 'Unknown'
