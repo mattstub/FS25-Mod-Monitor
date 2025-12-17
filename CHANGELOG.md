@@ -1,9 +1,46 @@
 # Changelog
 
-All notable changes to the FS25 Mod Monitor project will be documented in this file.
+All notable changes to the FS25 Mod Monitor project will be documented in this. file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.1.0] - 2024-12-16
+
+### Added
+
+- **Task Runner System** - Professional workflow automation tools
+  - `run.py` - Cross-platform Python task runner (works on Windows, Mac, Linux, PythonAnywhere)
+  - `Makefile` - Unix-style task runner for Mac/Linux/Git Bash users
+  - Quick commands for common operations: `python run.py test`, `python run.py run`, etc.
+  - Built-in help system showing all available commands
+  - Automated setup wizard for first-time configuration
+- **Testing Tools** - Standalone test scripts for verification
+  - `test_connection.py` - Tests FTP/SFTP connection independently
+  - `test_discord.py` - Tests Discord webhook independently
+  - Allows testing individual components before running full monitor
+- **Task Runner Documentation** - `TASK_RUNNER.md` with comprehensive guide
+  - Platform-specific instructions (Windows, Mac, Linux, PythonAnywhere)
+  - Examples for common workflows
+  - IDE integration guides (VS Code, PyCharm)
+  - Troubleshooting section
+
+### Changed
+
+- Added possible troubleshooting topics associated with testing to Wiki
+- Improved .gitignore to allow test scripts while blocking personal test files
+
+### Developer Experience Improvements
+
+- `python run.py setup` - One-command setup (copies config, installs deps)
+- `python run.py test` - Runs all tests (FTP + Discord)
+- `python run.py test-ftp` - Tests FTP/SFTP connection only
+- `python run.py test-discord` - Tests Discord webhook only
+- `python run.py run` - Runs the monitor
+- `python run.py update` - Pulls latest from GitHub
+- `python run.py status` - Shows current configuration
+- `python run.py clean` - Removes cache files
+- Equivalent `make` commands for Unix users
 
 ## [2.0.1] - 2024-12-16
 
